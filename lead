@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Speed-to-Lead Calculator | Mobile Text Alerts</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --teal: #1a7a5a;
+    --teal-dark: #145e46;
+    --teal-deeper: #0f4a37;
+    --teal-light: #edf5f0;
+    --teal-lighter: #f4f9f6;
+    --sage: #d4e4da;
+    --coral: #e8604c;
+    --coral-hover: #d4503e;
+    --bg: #ffffff;
+    --text: #1a3c34;
+    --text-sec: #4a6960;
+    --text-dim: #8a9f98;
+    --border: #d6e2dc;
+    --inp-bg: #f4f7f5;
+    --inp-focus: #eaf0ec;
+    --err: #d93025;
+    --amber: #d97706;
+    --amber-light: #fef3c7;
+    --shadow: 0 2px 8px rgba(26,60,52,0.06);
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--teal-lighter);
+    color: var(--text);
+    min-height: 100vh;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .calc-container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+  }
+
+  .calc-header {
+    text-align: center;
+    margin-bottom: 36px;
+  }
+
+  .calc-header .eyebrow {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1.8px;
+    text-transform: uppercase;
+    color: var(--teal);
+    margin-bottom: 12px;
+  }
+
+  .calc-header h1 {
+    font-size: 36px;
+    font-weight: 700;
+    color: var(--teal-dark);
+    line-height: 1.15;
+    margin-bottom: 8px;
+  }
+
+  .calc-header .subtitle {
+    font-size: 16px;
+    color: var(--text-sec);
+    max-width: 540px;
+    margin: 0 auto;
+  }
+
+  .calc-body {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    align-items: start;
+  }
+
+  /* ===== LEFT PANEL ===== */
+  .panel-input {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 32px;
+    box-shadow: var(--shadow);
+  }
+
+  .panel-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--teal);
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    margin-bottom: 24px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .field { margin-bottom: 16px; }
+
+  .field > label {
+    display: block;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-sec);
+    margin-bottom: 4px;
+  }
+
+  .field > label .req { color: var(--coral); margin-left: 2px; }
+
+  .field input, .field select {
+    width: 100%;
+    height: 42px;
+    padding: 0 12px;
+    background: var(--inp-bg);
+    border: 1.5px solid transparent;
+    border-radius: 8px;
+    color: var(--text);
+    font-family: inherit;
+    font-size: 14px;
+    transition: all 0.15s;
+    outline: none;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+
+  .field select {
+    background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%238a9f98' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 32px;
+    cursor: pointer;
+  }
+
+  .field input:focus, .field select:focus {
+    border-color: var(--teal);
+    background: var(--inp-focus);
+  }
+
+  .field input::placeholder { color: var(--text-dim); }
+
+  .inp-w { position: relative; }
+  .inp-w .pre {
+    position:absolute; left:12px; top:50%; transform:translateY(-50%);
+    color:var(--text-dim); font-size:14px; pointer-events:none;
+  }
+  .inp-w .suf {
+    position:absolute; right:12px; top:50%; transform:translateY(-50%);
+    color:var(--text-dim); font-size:11px; font-weight:600; pointer-events:none;
+  }
+  .inp-w input.pl { padding-left:28px; }
+  .inp-w input.pr { padding-right:34px; }
+
+  .row2 { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+
+  /* Response time selector */
+  .time-options {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .time-options label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    background: var(--inp-bg);
+    border: 1.5px solid transparent;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.15s;
+    user-select: none;
+  }
+
+  .time-options label:hover { background: var(--inp-focus); }
+
+  .time-options input { display: none; }
+
+  .time-options label.on {
+    border-color: var(--teal);
+    background: var(--teal-light);
+  }
+
+  .time-options .t-text {
+    flex: 1;
+    font-size: 13px;
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  .time-options .t-badge {
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 100px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .t-badge.optimal { background: var(--teal-light); color: var(--teal); }
+  .t-badge.slow { background: #fef3c7; color: #92400e; }
+  .t-badge.critical { background: #fee2e2; color: #991b1b; }
+
+  .btn-calc {
+    width: 100%;
+    height: 46px;
+    margin-top: 8px;
+    background: var(--coral);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .btn-calc:hover { background: var(--coral-hover); }
+
+  .err-msg { color:var(--err); font-size:11px; margin-top:2px; display:none; }
+  .field.err .err-msg { display:block; }
+  .field.err input, .field.err select { border-color:var(--err); }
+
+  /* ===== RIGHT PANEL ===== */
+  .panel-results {
+    position: sticky;
+    top: 24px;
+  }
+
+  .results-placeholder {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 48px 32px;
+    text-align: center;
+    box-shadow: var(--shadow);
+    min-height: 420px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .ph-icon {
+    width: 64px; height: 64px;
+    border-radius: 50%;
+    background: var(--teal-light);
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 20px;
+  }
+
+  .ph-icon svg { width:28px; height:28px; }
+
+  .results-placeholder h3 {
+    font-size: 18px; font-weight: 600;
+    color: var(--teal-dark); margin-bottom: 8px;
+  }
+
+  .results-placeholder p {
+    font-size: 14px; color: var(--text-dim); max-width: 280px;
+  }
+
+  .results-live { display: none; }
+  .results-live.on {
+    display: block;
+    animation: slideIn 0.5s ease-out;
+  }
+
+  @keyframes slideIn {
+    from { opacity:0; transform:translateY(12px); }
+    to { opacity:1; transform:translateY(0); }
+  }
+
+  /* Hero card */
+  .hero-card {
+    background: var(--teal-dark);
+    border-radius: 16px;
+    padding: 32px;
+    text-align: center;
+    margin-bottom: 16px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-card::before {
+    content:''; position:absolute; top:-40px; right:-40px;
+    width:120px; height:120px; border-radius:50%;
+    background:rgba(255,255,255,0.05);
+  }
+
+  .hero-card::after {
+    content:''; position:absolute; bottom:-30px; left:-30px;
+    width:80px; height:80px; border-radius:50%;
+    background:rgba(255,255,255,0.04);
+  }
+
+  .hero-card .h-label {
+    font-size:11px; font-weight:600; color:var(--sage);
+    text-transform:uppercase; letter-spacing:1.5px;
+    margin-bottom:8px; position:relative;
+  }
+
+  .hero-card .h-value {
+    font-size:52px; font-weight:700; color:#fff;
+    line-height:1; letter-spacing:-2px; position:relative;
+  }
+
+  .hero-card .h-sub {
+    font-size:13px; color:rgba(255,255,255,0.55);
+    margin-top:6px; position:relative;
+  }
+
+  /* Deals recovered callout */
+  .deals-callout {
+    background: var(--teal-light);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    margin-bottom: 16px;
+  }
+
+  .deals-callout .dc-value {
+    font-size: 36px;
+    font-weight: 700;
+    color: var(--teal);
+    line-height: 1;
+    letter-spacing: -1px;
+  }
+
+  .deals-callout .dc-label {
+    font-size: 13px;
+    color: var(--text-sec);
+    margin-top: 4px;
+  }
+
+  .stat-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .stat-card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: var(--shadow);
+  }
+
+  .stat-card .s-label {
+    font-size:10px; font-weight:600; color:var(--text-dim);
+    text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px;
+  }
+
+  .stat-card .s-value {
+    font-size:22px; font-weight:700; color:var(--text);
+    letter-spacing:-0.5px;
+  }
+
+  .stat-card .s-value.teal { color:var(--teal); }
+
+  /* Timeline visual */
+  .timeline-card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 16px;
+    box-shadow: var(--shadow);
+  }
+
+  .timeline-card .tc-title {
+    font-size:11px; font-weight:600; color:var(--text-dim);
+    text-transform:uppercase; letter-spacing:0.5px; margin-bottom:16px;
+  }
+
+  .timeline-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+
+  .timeline-row:last-child { margin-bottom: 0; }
+
+  .tl-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 14px;
+  }
+
+  .tl-icon.slow { background: #fee2e2; }
+  .tl-icon.fast { background: var(--teal-light); }
+
+  .tl-content { flex: 1; }
+
+  .tl-content .tl-label {
+    font-size: 11px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
+
+  .tl-content .tl-time {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .tl-content .tl-time.teal { color: var(--teal); }
+
+  .tl-arrow {
+    font-size: 18px;
+    color: var(--teal);
+    font-weight: 700;
+  }
+
+  /* Comparison bars */
+  .compare-card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 16px;
+    box-shadow: var(--shadow);
+  }
+
+  .compare-card .cc-title {
+    font-size:11px; font-weight:600; color:var(--text-dim);
+    text-transform:uppercase; letter-spacing:0.5px; margin-bottom:14px;
+  }
+
+  .bar-group { margin-bottom:14px; }
+  .bar-group:last-child { margin-bottom:0; }
+
+  .bar-section-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 8px;
+  }
+
+  .bar-header {
+    display:flex; justify-content:space-between; align-items:center;
+    margin-bottom:4px;
+  }
+
+  .bar-header .bar-label { font-size:11px; color:var(--text-dim); }
+  .bar-header .bar-val { font-size:13px; font-weight:700; color:var(--text); }
+  .bar-header .bar-val.teal { color:var(--teal); }
+
+  .bar-track {
+    width:100%; height:8px;
+    background:var(--teal-light);
+    border-radius:4px; overflow:hidden;
+    margin-bottom: 6px;
+  }
+
+  .bar-fill {
+    height:100%; border-radius:4px;
+    transition:width 0.8s ease-out; width:0;
+  }
+
+  .bar-fill.current { background:var(--sage); }
+  .bar-fill.sms { background:var(--teal); }
+
+  /* Assumptions */
+  .assumptions-card {
+    background: var(--teal-light);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+
+  .assumptions-card h4 {
+    font-size:11px; font-weight:600; color:var(--teal);
+    text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px;
+  }
+
+  .assumptions-card p {
+    font-size:12px; color:var(--text-sec); line-height:1.7;
+  }
+
+  /* CTA */
+  .cta-card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    text-align: center;
+    box-shadow: var(--shadow);
+  }
+
+  .cta-card h3 {
+    font-size:17px; font-weight:700; color:var(--teal-dark); margin-bottom:4px;
+  }
+
+  .cta-card p {
+    font-size:13px; color:var(--text-sec); margin-bottom:14px;
+  }
+
+  .cta-btns { display:flex; justify-content:center; gap:8px; flex-wrap:wrap; }
+
+  .cta-btn {
+    display:inline-flex; align-items:center; justify-content:center;
+    height:40px; padding:0 20px; border-radius:8px;
+    font-family:inherit; font-size:12px; font-weight:600;
+    cursor:pointer; text-decoration:none; transition:all 0.15s;
+    border:none; text-transform:uppercase; letter-spacing:0.5px;
+  }
+
+  .cta-btn.primary { background:var(--coral); color:#fff; }
+  .cta-btn.primary:hover { background:var(--coral-hover); }
+  .cta-btn.outline { background:transparent; color:var(--teal); border:1.5px solid var(--teal); }
+  .cta-btn.outline:hover { background:var(--teal-light); }
+
+  .recalc-link {
+    display:inline-block; margin-top:12px;
+    font-size:12px; color:var(--text-dim);
+    text-decoration:underline; cursor:pointer;
+    transition:color 0.15s;
+  }
+  .recalc-link:hover { color:var(--teal); }
+
+  /* ===== MOBILE ===== */
+  @media (max-width: 768px) {
+    .calc-body { grid-template-columns: 1fr; }
+    .panel-results { position: static; }
+    .calc-header h1 { font-size: 28px; }
+    .hero-card .h-value { font-size: 40px; }
+    .deals-callout .dc-value { font-size: 30px; }
+  }
+
+  @media (max-width: 480px) {
+    .calc-container { padding: 24px 16px 60px; }
+    .panel-input { padding: 24px; }
+    .row2 { grid-template-columns: 1fr; }
+    .stat-row { grid-template-columns: 1fr; }
+    .cta-btns { flex-direction: column; }
+    .cta-btn { width: 100%; }
+  }
+</style>
+</head>
+<body>
+
+<div class="calc-container">
+
+  <div class="calc-header">
+    <div class="eyebrow">Speed-to-Lead Calculator</div>
+    <h1>How Many Deals Are You Losing to Slow Response Times?</h1>
+    <p class="subtitle">78% of customers buy from the first company to respond. See how many more deals SMS could help you close.</p>
+  </div>
+
+  <div class="calc-body">
+
+    <!-- LEFT: INPUTS -->
+    <div class="panel-input">
+      <div class="panel-title">Your Lead Pipeline</div>
+
+      <div class="field">
+        <label>Monthly inbound leads <span class="req">*</span></label>
+        <input type="text" id="leads" placeholder="e.g. 200" inputmode="numeric">
+        <div class="err-msg">Minimum 10 leads</div>
+      </div>
+
+      <div class="field">
+        <label>Average response time to new leads <span class="req">*</span></label>
+        <div class="time-options" id="timeOptions">
+          <label onclick="pickTime('under5',this,1.1)">
+            <input type="radio" name="rtime" value="under5">
+            <span class="t-text">Under 5 minutes</span>
+            <span class="t-badge optimal">Optimal</span>
+          </label>
+          <label onclick="pickTime('5to30',this,2)">
+            <input type="radio" name="rtime" value="5to30">
+            <span class="t-text">5 to 30 minutes</span>
+          </label>
+          <label onclick="pickTime('30to60',this,3)">
+            <input type="radio" name="rtime" value="30to60">
+            <span class="t-text">30 to 60 minutes</span>
+            <span class="t-badge slow">Slow</span>
+          </label>
+          <label onclick="pickTime('1to4h',this,5)">
+            <input type="radio" name="rtime" value="1to4h">
+            <span class="t-text">1 to 4 hours</span>
+            <span class="t-badge slow">Slow</span>
+          </label>
+          <label onclick="pickTime('4hplus',this,7)">
+            <input type="radio" name="rtime" value="4hplus">
+            <span class="t-text">4+ hours / next day</span>
+            <span class="t-badge critical">Critical</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="row2">
+        <div class="field">
+          <label>Current close rate <span class="req">*</span></label>
+          <div class="inp-w">
+            <input type="text" id="closeRate" placeholder="e.g. 10" class="pr" inputmode="decimal">
+            <span class="suf">%</span>
+          </div>
+          <div class="err-msg">0.1 - 100%</div>
+        </div>
+        <div class="field">
+          <label>Average deal value <span class="req">*</span></label>
+          <div class="inp-w">
+            <span class="pre">$</span>
+            <input type="text" id="dealVal" placeholder="e.g. 500" class="pl" inputmode="decimal">
+          </div>
+          <div class="err-msg">Minimum $1</div>
+        </div>
+      </div>
+
+      <button class="btn-calc" onclick="onCalc()">Show Me What I'm Missing</button>
+    </div>
+
+    <!-- RIGHT: RESULTS -->
+    <div class="panel-results">
+
+      <div class="results-placeholder" id="placeholder">
+        <div class="ph-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#1a7a5a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <polyline points="12 6 12 12 16 14"/>
+          </svg>
+        </div>
+        <h3>Your Results Will Appear Here</h3>
+        <p>Enter your lead pipeline details to see how much revenue you could recover with faster SMS response times.</p>
+      </div>
+
+      <div class="results-live" id="resultsLive">
+
+        <div class="hero-card">
+          <div class="h-label">Additional Annual Revenue Recovered</div>
+          <div class="h-value" id="heroVal">$0</div>
+          <div class="h-sub">by responding to leads via SMS</div>
+        </div>
+
+        <div class="deals-callout">
+          <div class="dc-value" id="dealsRecovered">+0</div>
+          <div class="dc-label">additional deals closed per month</div>
+        </div>
+
+        <div class="stat-row">
+          <div class="stat-card">
+            <div class="s-label">Current Deals / Month</div>
+            <div class="s-value" id="sCurDeals">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="s-label">Projected Deals with SMS</div>
+            <div class="s-value teal" id="sSmsDeals">0</div>
+          </div>
+        </div>
+
+        <div class="stat-row">
+          <div class="stat-card">
+            <div class="s-label">Current Monthly Revenue</div>
+            <div class="s-value" id="sCurRev">$0</div>
+          </div>
+          <div class="stat-card">
+            <div class="s-label">Projected Monthly with SMS</div>
+            <div class="s-value teal" id="sSmsRev">$0</div>
+          </div>
+        </div>
+
+        <!-- Timeline visual -->
+        <div class="timeline-card">
+          <div class="tc-title">Response Time Comparison</div>
+          <div class="timeline-row">
+            <div class="tl-icon slow">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#991b1b" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            </div>
+            <div class="tl-content">
+              <div class="tl-label">Your Current Response</div>
+              <div class="tl-time" id="tlCurrent">30-60 minutes</div>
+            </div>
+          </div>
+          <div style="text-align:center; padding:4px 0;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1a7a5a" stroke-width="2.5"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+          </div>
+          <div class="timeline-row">
+            <div class="tl-icon fast">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1a7a5a" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+            </div>
+            <div class="tl-content">
+              <div class="tl-label">SMS Automated Response</div>
+              <div class="tl-time teal">Under 1 minute</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Close rate comparison bars -->
+        <div class="compare-card">
+          <div class="cc-title">Close Rate Improvement</div>
+          <div class="bar-group">
+            <div class="bar-header">
+              <span class="bar-label">Current close rate</span>
+              <span class="bar-val" id="bCurClose">10%</span>
+            </div>
+            <div class="bar-track"><div class="bar-fill current" id="barCurClose"></div></div>
+            <div class="bar-header" style="margin-top:8px">
+              <span class="bar-label" style="color:var(--teal)">Projected with SMS</span>
+              <span class="bar-val teal" id="bSmsClose">20%</span>
+            </div>
+            <div class="bar-track"><div class="bar-fill sms" id="barSmsClose"></div></div>
+          </div>
+        </div>
+
+        <div class="assumptions-card">
+          <h4>How We Calculated This</h4>
+          <p id="assumpText"></p>
+        </div>
+
+        <div class="cta-card">
+          <h3>Stop Losing Deals to Slow Responses</h3>
+          <p>Free 14-day trial. No credit card required.</p>
+          <div class="cta-btns">
+            <a href="https://mobile-text-alerts.com/signup" class="cta-btn primary">Start Free Trial</a>
+            <a href="https://mobile-text-alerts.com/contact" class="cta-btn outline">Talk to Sales</a>
+          </div>
+          <span class="recalc-link" onclick="onReset()">Recalculate with different numbers</span>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  var selectedTime = null;
+  var selectedMultiplier = null;
+  var timeLabels = {
+    under5: 'Under 5 minutes',
+    '5to30': '5 to 30 minutes',
+    '30to60': '30 to 60 minutes',
+    '1to4h': '1 to 4 hours',
+    '4hplus': '4+ hours / next day'
+  };
+
+  window.pickTime = function(val, el, mult) {
+    document.querySelectorAll('#timeOptions label').forEach(function(l) { l.classList.remove('on'); });
+    el.classList.add('on');
+    el.querySelector('input').checked = true;
+    selectedTime = val;
+    selectedMultiplier = mult;
+  };
+
+  function pn(v) { return parseFloat(v.replace(/[^0-9.]/g,'')); }
+  function fc(n) { return n>=1e6?'$'+(n/1e6).toFixed(1)+'M':'$'+Math.round(n).toLocaleString('en-US'); }
+
+  function vf(id,min,max) {
+    var el=document.getElementById(id),g=el.closest('.field'),v=pn(el.value);
+    if(isNaN(v)||v<min||(max!==undefined&&v>max)){g.classList.add('err');return null;}
+    g.classList.remove('err');return v;
+  }
+
+  function animVal(el,target,prefix,suffix) {
+    prefix=prefix||''; suffix=suffix||'';
+    var dur=600,start=null;
+    function step(ts) {
+      if(!start) start=ts;
+      var p=Math.min((ts-start)/dur,1);
+      p=1-Math.pow(1-p,3);
+      el.textContent=prefix+Math.round(target*p).toLocaleString('en-US')+suffix;
+      if(p<1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+
+  window.onCalc = function() {
+    var ok = true;
+    if(vf('leads',10)===null) ok=false;
+    if(!selectedTime) return;
+    if(vf('closeRate',0.1,100)===null) ok=false;
+    if(vf('dealVal',1)===null) ok=false;
+    if(!ok) return;
+    calc();
+  };
+
+  window.onReset = function() {
+    document.getElementById('resultsLive').classList.remove('on');
+    document.getElementById('placeholder').style.display='flex';
+    document.querySelectorAll('.bar-fill').forEach(function(b){b.style.width='0';});
+  };
+
+  function calc() {
+    var leads = pn(document.getElementById('leads').value);
+    var cr = pn(document.getElementById('closeRate').value)/100;
+    var dv = pn(document.getElementById('dealVal').value);
+    var mult = selectedMultiplier;
+
+    // Current
+    var curDeals = leads * cr;
+    var curRev = curDeals * dv;
+
+    // SMS projected - cap close rate at 100%
+    var smsCr = Math.min(cr * mult, 1);
+    var smsDeals = leads * smsCr;
+    var smsRev = smsDeals * dv;
+
+    var addlDeals = smsDeals - curDeals;
+    var addlRev = smsRev - curRev;
+    var addlAnnual = addlRev * 12;
+
+    document.getElementById('placeholder').style.display='none';
+    document.getElementById('resultsLive').classList.add('on');
+
+    // Hero
+    animVal(document.getElementById('heroVal'), Math.round(addlAnnual), '$');
+
+    // Deals recovered
+    animVal(document.getElementById('dealsRecovered'), Math.round(addlDeals), '+');
+
+    // Stats
+    animVal(document.getElementById('sCurDeals'), Math.round(curDeals));
+    animVal(document.getElementById('sSmsDeals'), Math.round(smsDeals));
+    animVal(document.getElementById('sCurRev'), Math.round(curRev), '$');
+    animVal(document.getElementById('sSmsRev'), Math.round(smsRev), '$');
+
+    // Timeline
+    document.getElementById('tlCurrent').textContent = timeLabels[selectedTime];
+
+    // Close rate bars
+    document.getElementById('bCurClose').textContent = (cr*100).toFixed(1)+'%';
+    document.getElementById('bSmsClose').textContent = (smsCr*100).toFixed(1)+'%';
+
+    setTimeout(function() {
+      var maxRate = Math.max(smsCr*100, 20);
+      document.getElementById('barCurClose').style.width = ((cr*100/maxRate)*100)+'%';
+      document.getElementById('barSmsClose').style.width = ((smsCr*100/maxRate)*100)+'%';
+    }, 100);
+
+    // Assumptions text
+    var sourceNote = '';
+    if(selectedTime === 'under5') {
+      sourceNote = 'You are already responding near the optimal window. The 1.1x multiplier accounts for SMS automation ensuring consistent sub-minute responses even outside business hours.';
+    } else if(selectedTime === '5to30') {
+      sourceNote = 'Research from Harvard Business Review and the Lead Response Management Study shows leads contacted within 5 minutes have 21x higher qualification rates than those contacted at 30 minutes. We apply a conservative 2x close rate multiplier.';
+    } else if(selectedTime === '30to60') {
+      sourceNote = 'Drift research shows a 10x increase in lead loss risk after just 5 minutes. At 30-60 minutes, most competitors have already made contact. We apply a 3x close rate multiplier, conservative against the research.';
+    } else if(selectedTime === '1to4h') {
+      sourceNote = 'At 1-4 hours, leads have likely engaged with competitors. Velocify research shows calling within 1 minute boosts conversion by 391%. We apply a 5x multiplier to reflect the significant gap between hours and sub-minute SMS response.';
+    } else {
+      sourceNote = 'B2B SaaS companies average 42 hours to respond (Lead Response Management Study). At this delay, 78% of deals go to the first responder, which is not you. We apply a 7x multiplier, still conservative against the 21x qualification data.';
+    }
+
+    document.getElementById('assumpText').textContent =
+      'SMS enables automated responses within seconds of a lead inquiry, compared to your current average of ' +
+      timeLabels[selectedTime].toLowerCase() + '. ' + sourceNote +
+      ' Applied to your ' + leads.toLocaleString() + ' monthly leads at a ' +
+      (cr*100).toFixed(1) + '% close rate and $' + dv.toLocaleString() + ' deal value.';
+  }
+
+  document.getElementById('leads').addEventListener('blur',function(){
+    var v=pn(this.value);
+    if(!isNaN(v)&&v>0) this.value=v.toLocaleString('en-US');
+  });
+})();
+</script>
+</body>
+</html>
