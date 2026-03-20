@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SMS Compliance by Country | Mobile Text Alerts</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: #f5f2ec;
+  color: #1a2e1a;
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+/* Nav */
+.nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 40px;
+  background: #1a3c2a;
+  border-bottom: 3px solid #e8734a;
+  position: sticky;
+  top: 0;
+  z-index: 200;
+}
+.nav-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #fff;
+  font-weight: 700;
+  font-size: 16px;
+  letter-spacing: -0.3px;
+  line-height: 1.15;
+}
+.nav-links { display: flex; gap: 28px; }
+.nav-links a {
+  color: rgba(255,255,255,0.7);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+.nav-links a:hover { color: #fff; }
+.nav-right { display: flex; align-items: center; gap: 16px; }
+.nav-login {
+  color: rgba(255,255,255,0.8);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 600;
+}
+.nav-cta {
+  background: #e8734a;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 24px;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+}
+.nav-cta:hover { background: #d4623b; }
+
+/* Page content */
+.page-wrapper {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+  position: relative;
+}
+
+/* Decorative floating shapes matching MTA's style */
+.page-decor {
+  position: absolute;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Hero */
+.hero {
+  text-align: center;
+  padding: 56px 0 20px;
+  position: relative;
+  z-index: 1;
+}
+.hero-eyebrow {
+  display: inline-block;
+  font-size: 16px;
+  font-style: italic;
+  color: #1a3c2a;
+  margin-bottom: 8px;
+}
+.hero-eyebrow-line {
+  display: block;
+  width: 100%;
+  height: 3px;
+  background: #5bbfaf;
+  margin-top: 4px;
+  border-radius: 2px;
+}
+.hero h1 {
+  font-size: 50px;
+  font-weight: 700;
+  letter-spacing: -1.5px;
+  line-height: 1.08;
+  margin-bottom: 16px;
+  color: #1a2e1a;
+}
+.hero p {
+  font-size: 17px;
+  color: #5a6b5a;
+  max-width: 560px;
+  margin: 0 auto 28px;
+  line-height: 1.6;
+}
+.hero-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+}
+.btn-primary {
+  background: #e8734a;
+  color: #fff;
+  border: none;
+  padding: 14px 28px;
+  border-radius: 28px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  transition: background 0.2s;
+}
+.btn-primary:hover { background: #d4623b; }
+.btn-secondary {
+  background: transparent;
+  color: #1a3c2a;
+  border: 1.5px solid #1a3c2a;
+  padding: 14px 28px;
+  border-radius: 28px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  transition: all 0.2s;
+}
+.btn-secondary:hover { background: #1a3c2a; color: #fff; }
+
+/* Globe */
+.globe-section {
+  position: relative;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+.globe-area {
+  position: relative;
+  height: 560px;
+  overflow: visible;
+}
+#globe-container {
+  width: 100%;
+  height: 100%;
+  cursor: grab;
+}
+#globe-container:active { cursor: grabbing; }
+
+.globe-hint {
+  text-align: center;
+  font-size: 13px;
+  color: #a0a898;
+  padding: 4px 0 8px;
+  font-style: italic;
+}
+
+/* Tooltip */
+.tooltip {
+  position: absolute;
+  background: #fff;
+  border: 1px solid #e2dfd8;
+  border-radius: 16px;
+  padding: 24px;
+  min-width: 300px;
+  max-width: 340px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s, transform 0.25s;
+  transform: translateY(8px);
+  z-index: 100;
+  box-shadow: 0 12px 40px rgba(26,44,26,0.1);
+  color: #1a2e1a;
+}
+.tooltip.active {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+.tooltip-flag { font-size: 32px; margin-bottom: 8px; }
+.tooltip-country {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 2px;
+  letter-spacing: -0.3px;
+}
+.tooltip-regulation {
+  font-size: 12px;
+  font-weight: 700;
+  color: #e8734a;
+  margin-bottom: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.tooltip-desc {
+  font-size: 14px;
+  color: #5a6b5a;
+  line-height: 1.6;
+  margin-bottom: 16px;
+}
+.tooltip-stats {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #eee9e0;
+}
+.tooltip-stat-item { flex: 1; }
+.tooltip-stat-label {
+  font-size: 11px;
+  color: #a0a898;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 2px;
+  font-weight: 600;
+}
+.tooltip-stat-value {
+  font-size: 15px;
+  font-weight: 700;
+  color: #1a3c2a;
+}
+.tooltip-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #1a3c2a;
+  color: #fff;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 24px;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s;
+  width: 100%;
+  justify-content: center;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+.tooltip-cta:hover { background: #244d34; }
+.tooltip-cta svg { width: 14px; height: 14px; }
+.tooltip-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  background: #f5f2ec;
+  border: none;
+  color: #a0a898;
+  cursor: pointer;
+  font-size: 15px;
+  line-height: 1;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+.tooltip-close:hover { background: #eee9e0; color: #1a2e1a; }
+
+/* Country pills */
+.country-pills {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 8px 24px 40px;
+}
+.country-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #fff;
+  border: 1.5px solid #ddd9d2;
+  color: #5a6b5a;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 8px 16px;
+  border-radius: 100px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.country-pill:hover {
+  border-color: #1a3c2a;
+  color: #1a3c2a;
+}
+.country-pill.active {
+  background: #1a3c2a;
+  border-color: #1a3c2a;
+  color: #fff;
+}
+.country-pill-flag { font-size: 16px; }
+
+/* Stats bar */
+.stats-bar {
+  display: flex;
+  justify-content: center;
+  gap: 48px;
+  padding: 40px 24px;
+  background: #1a3c2a;
+  border-radius: 16px;
+  margin: 0 24px 48px;
+  position: relative;
+  overflow: hidden;
+}
+.stats-bar::before {
+  content: '';
+  position: absolute;
+  top: -40px;
+  right: -40px;
+  width: 140px;
+  height: 140px;
+  background: rgba(91,191,175,0.08);
+  border-radius: 50%;
+}
+.stat-item { text-align: center; position: relative; z-index: 1; }
+.stat-value {
+  font-size: 32px;
+  font-weight: 700;
+  color: #fff;
+}
+.stat-label {
+  font-size: 13px;
+  color: rgba(255,255,255,0.45);
+  margin-top: 4px;
+}
+
+/* Mockup label */
+.mockup-label {
+  position: fixed;
+  bottom: 16px;
+  right: 16px;
+  background: #e8734a;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 6px 12px;
+  border-radius: 6px;
+  letter-spacing: 0.5px;
+  z-index: 999;
+  text-transform: uppercase;
+}
+</style>
+</head>
+<body>
+
+<!-- Decorative shapes (matching MTA's pastel circles + diamond style) -->
+<div style="position:fixed;pointer-events:none;z-index:0;top:200px;left:-30px;width:100px;height:100px;background:#c8e6df;border-radius:50%;opacity:0.45;"></div>
+<div style="position:fixed;pointer-events:none;z-index:0;top:340px;right:50px;width:50px;height:50px;background:#1a3c2a;border-radius:6px;transform:rotate(45deg);opacity:0.12;"></div>
+<div style="position:fixed;pointer-events:none;z-index:0;top:600px;right:-20px;width:80px;height:80px;background:#b8d8d0;border-radius:50%;opacity:0.3;"></div>
+<div style="position:fixed;pointer-events:none;z-index:0;bottom:180px;left:50px;width:45px;height:45px;background:#c8e6df;border-radius:50%;opacity:0.3;"></div>
+
+<!-- Dashed decorative curves (SVG) -->
+<svg style="position:fixed;top:140px;left:-50px;width:320px;height:380px;pointer-events:none;z-index:0;opacity:0.18;">
+  <path d="M20,340 Q70,200 180,175 Q300,150 280,40" fill="none" stroke="#999" stroke-width="1.5" stroke-dasharray="6 6"/>
+</svg>
+<svg style="position:fixed;top:320px;right:-30px;width:280px;height:320px;pointer-events:none;z-index:0;opacity:0.18;">
+  <path d="M260,20 Q190,110 200,200 Q220,300 90,310" fill="none" stroke="#999" stroke-width="1.5" stroke-dasharray="6 6"/>
+</svg>
+
+<!-- Nav -->
+<nav class="nav">
+  <div class="nav-logo">
+    <svg viewBox="0 0 36 36" fill="none" width="36" height="36">
+      <circle cx="18" cy="18" r="15" fill="none" stroke="#e8734a" stroke-width="2.5"/>
+      <path d="M12 15 Q18 9 24 15" fill="none" stroke="#5bbfaf" stroke-width="2.5" stroke-linecap="round"/>
+      <circle cx="18" cy="22" r="2.5" fill="#e8734a"/>
+    </svg>
+    <span>Mobile<br>Text Alerts</span>
+  </div>
+  <div class="nav-links">
+    <a href="#">Solutions</a>
+    <a href="#">Platform</a>
+    <a href="#">Resources</a>
+    <a href="#">Pricing</a>
+    <a href="#">Developers</a>
+  </div>
+  <div class="nav-right">
+    <a href="#" class="nav-login">LOG IN</a>
+    <button class="nav-cta">Instant 14-Day Free Trial</button>
+  </div>
+</nav>
+
+<div class="page-wrapper">
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-eyebrow">
+      Global SMS Compliance Hub
+      <span class="hero-eyebrow-line"></span>
+    </div>
+    <h1>Send SMS anywhere,<br>stay compliant everywhere</h1>
+    <p>Navigate SMS regulations across 200+ countries. Click any region to see local compliance requirements and how Mobile Text Alerts keeps you covered.</p>
+    <div class="hero-buttons">
+      <button class="btn-primary">Start my free trial</button>
+      <button class="btn-secondary">Book a demo</button>
+    </div>
+  </div>
+
+</div>
+
+<div class="globe-hint">Drag to rotate. Click a marker or country below to explore.</div>
+
+<!-- Globe + Tooltip -->
+<div class="globe-section">
+  <div class="globe-area">
+    <div id="globe-container"></div>
+    <div class="tooltip" id="tooltip">
+      <button class="tooltip-close" onclick="hideTooltip()">&times;</button>
+      <div class="tooltip-flag" id="tt-flag"></div>
+      <div class="tooltip-country" id="tt-country"></div>
+      <div class="tooltip-regulation" id="tt-reg"></div>
+      <div class="tooltip-desc" id="tt-desc"></div>
+      <div class="tooltip-stats">
+        <div class="tooltip-stat-item">
+          <div class="tooltip-stat-label">Opt-in required</div>
+          <div class="tooltip-stat-value" id="tt-optin"></div>
+        </div>
+        <div class="tooltip-stat-item">
+          <div class="tooltip-stat-label">Penalty range</div>
+          <div class="tooltip-stat-value" id="tt-penalty"></div>
+        </div>
+      </div>
+      <button class="tooltip-cta" onclick="void(0)">
+        Read full country guide
+        <svg viewBox="0 0 14 14" fill="none"><path d="M3 7h8M8 4l3 3-3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Country pills -->
+<div class="country-pills" id="country-pills"></div>
+
+<!-- Stats bar -->
+<div class="stats-bar">
+  <div class="stat-item">
+    <div class="stat-value">200+</div>
+    <div class="stat-label">Countries supported</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-value">99.96%</div>
+    <div class="stat-label">Delivery rate</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-value">24/7</div>
+    <div class="stat-label">Compliance monitoring</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-value">SOC 2</div>
+    <div class="stat-label">Certified</div>
+  </div>
+</div>
+
+<div class="mockup-label">Mockup / Concept</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+const countries = [
+  { name:'United States', flag:'\u{1F1FA}\u{1F1F8}', lat:39.8, lon:-98.5, regulation:'TCPA + FCC', desc:'The Telephone Consumer Protection Act requires prior express written consent for marketing texts. Violations carry fines of $500\u2013$1,500 per message.', optin:'Express written', penalty:'$500\u2013$1.5K/msg' },
+  { name:'United Kingdom', flag:'\u{1F1EC}\u{1F1E7}', lat:54.0, lon:-2.0, regulation:'PECR + ICO', desc:'Privacy and Electronic Communications Regulations require specific consent for direct marketing SMS. The ICO can issue substantial fines for non-compliance.', optin:'Soft or express', penalty:'Up to \u00A3500K' },
+  { name:'Canada', flag:'\u{1F1E8}\u{1F1E6}', lat:56.1, lon:-106.3, regulation:'CASL', desc:"Canada's Anti-Spam Legislation is one of the strictest globally. Requires express or implied consent with clear identification and unsubscribe mechanisms.", optin:'Express or implied', penalty:'Up to $10M CAD' },
+  { name:'Australia', flag:'\u{1F1E6}\u{1F1FA}', lat:-25.3, lon:133.8, regulation:'Spam Act + ACMA', desc:'The Spam Act 2003 requires consent, sender identification, and an unsubscribe facility in every commercial message. ACMA enforces with significant penalties.', optin:'Express or inferred', penalty:'Up to $2.2M AUD/day' },
+  { name:'India', flag:'\u{1F1EE}\u{1F1F3}', lat:20.6, lon:79.0, regulation:'TRAI DND', desc:"TRAI's Do Not Disturb regulations use a national registry system. Senders must register message templates and transactional vs promotional categories.", optin:'Template-based', penalty:'License revocation' },
+  { name:'Germany', flag:'\u{1F1E9}\u{1F1EA}', lat:51.2, lon:10.4, regulation:'GDPR + UWG', desc:'Under GDPR, SMS marketing requires explicit, granular consent. German competition law (UWG) adds further restrictions on unsolicited commercial communications.', optin:'Double opt-in', penalty:'Up to \u20AC20M / 4% rev' },
+  { name:'Brazil', flag:'\u{1F1E7}\u{1F1F7}', lat:-14.2, lon:-51.9, regulation:'LGPD', desc:"Brazil's General Data Protection Law requires clear legal basis for processing personal data including phone numbers. Consent must be free, informed, and unambiguous.", optin:'Express consent', penalty:'Up to 2% of revenue' },
+  { name:'Singapore', flag:'\u{1F1F8}\u{1F1EC}', lat:1.35, lon:103.8, regulation:'PDPA + DNC', desc:'The Personal Data Protection Act combined with the Do Not Call Registry requires businesses to check the DNC registry before sending marketing messages.', optin:'Clear & informed', penalty:'Up to S$1M' }
+];
+
+const pillsContainer = document.getElementById('country-pills');
+countries.forEach((c, i) => {
+  const pill = document.createElement('div');
+  pill.className = 'country-pill';
+  pill.innerHTML = '<span class="country-pill-flag">'+c.flag+'</span>'+c.name;
+  pill.onclick = () => focusCountry(i);
+  pillsContainer.appendChild(pill);
+});
+
+const container = document.getElementById('globe-container');
+const w = container.clientWidth;
+const h = container.clientHeight;
+
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(45, w/h, 0.1, 1000);
+camera.position.z = 3.2;
+
+const renderer = new THREE.WebGLRenderer({ antialias:true, alpha:true });
+renderer.setSize(w, h);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.setClearColor(0x000000, 0);
+container.appendChild(renderer.domElement);
+
+// Globe: soft pastel green to match their background
+const globeGeo = new THREE.SphereGeometry(1, 64, 64);
+const globeMat = new THREE.MeshPhongMaterial({
+  color: 0xc8e6df,
+  emissive: 0xa8d0c4,
+  emissiveIntensity: 0.12,
+  specular: 0xffffff,
+  shininess: 18,
+  transparent: true,
+  opacity: 0.95
+});
+const globe = new THREE.Mesh(globeGeo, globeMat);
+scene.add(globe);
+
+// Wireframe in dark green
+const wireGeo = new THREE.SphereGeometry(1.003, 36, 18);
+const wireMat = new THREE.MeshBasicMaterial({ color:0x1a3c2a, wireframe:true, transparent:true, opacity:0.06 });
+scene.add(new THREE.Mesh(wireGeo, wireMat));
+const wireRef = scene.children[scene.children.length - 1];
+
+// Atmosphere: soft teal glow
+const atmosGeo = new THREE.SphereGeometry(1.06, 64, 64);
+const atmosMat = new THREE.ShaderMaterial({
+  vertexShader: 'varying vec3 vN;void main(){vN=normalize(normalMatrix*normal);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}',
+  fragmentShader: 'varying vec3 vN;void main(){float i=pow(0.58-dot(vN,vec3(0,0,1)),2.5);gl_FragColor=vec4(0.36,0.75,0.68,1.0)*i*0.4;}',
+  blending: THREE.AdditiveBlending,
+  side: THREE.BackSide,
+  transparent: true
+});
+scene.add(new THREE.Mesh(atmosGeo, atmosMat));
+
+scene.add(new THREE.AmbientLight(0xffffff, 0.75));
+const dl = new THREE.DirectionalLight(0xffffff, 0.55);
+dl.position.set(5,3,5);
+scene.add(dl);
+const fl = new THREE.DirectionalLight(0xd4ebe4, 0.25);
+fl.position.set(-3,-2,3);
+scene.add(fl);
+
+function latLonToVec3(lat, lon, r) {
+  const phi = (90-lat)*(Math.PI/180);
+  const theta = (lon+180)*(Math.PI/180);
+  return new THREE.Vector3(-(r*Math.sin(phi)*Math.cos(theta)), r*Math.cos(phi), r*Math.sin(phi)*Math.sin(theta));
+}
+
+const markers = [];
+const markerGroup = new THREE.Group();
+scene.add(markerGroup);
+
+countries.forEach((c, i) => {
+  const pos = latLonToVec3(c.lat, c.lon, 1.012);
+  const origin = new THREE.Vector3(0,0,0);
+
+  const ringGeo = new THREE.RingGeometry(0.025, 0.04, 24);
+  const ringMat = new THREE.MeshBasicMaterial({ color:0xe8734a, transparent:true, opacity:0.85, side:THREE.DoubleSide });
+  const ring = new THREE.Mesh(ringGeo, ringMat);
+  ring.position.copy(pos); ring.lookAt(origin);
+
+  const dotGeo = new THREE.CircleGeometry(0.018, 16);
+  const dotMat = new THREE.MeshBasicMaterial({ color:0xe8734a, transparent:true, opacity:1, side:THREE.DoubleSide });
+  const dot = new THREE.Mesh(dotGeo, dotMat);
+  dot.position.copy(pos); dot.lookAt(origin);
+
+  const pulseGeo = new THREE.RingGeometry(0.04, 0.047, 24);
+  const pulseMat = new THREE.MeshBasicMaterial({ color:0xe8734a, transparent:true, opacity:0.5, side:THREE.DoubleSide });
+  const pulse = new THREE.Mesh(pulseGeo, pulseMat);
+  pulse.position.copy(pos); pulse.lookAt(origin);
+
+  markerGroup.add(ring); markerGroup.add(dot); markerGroup.add(pulse);
+  markers.push({ ring, dot, pulse, data:c, index:i, pos });
+});
+
+const raycaster = new THREE.Raycaster();
+const mouse = new THREE.Vector2();
+let isDragging = false, prevMouse = {x:0,y:0}, rotVel = {x:0,y:0};
+let autoRotate = true, targetRot = null, activeMarker = -1;
+
+container.addEventListener('mousedown', e => { isDragging=true; autoRotate=false; prevMouse={x:e.clientX,y:e.clientY}; });
+window.addEventListener('mousemove', e => {
+  if (!isDragging) return;
+  const dx=e.clientX-prevMouse.x, dy=e.clientY-prevMouse.y;
+  rotVel.x=dy*0.003; rotVel.y=dx*0.003;
+  globe.rotation.x+=rotVel.x; globe.rotation.y+=rotVel.y;
+  wireRef.rotation.copy(globe.rotation); markerGroup.rotation.copy(globe.rotation);
+  prevMouse={x:e.clientX,y:e.clientY};
+});
+window.addEventListener('mouseup', () => { isDragging=false; setTimeout(()=>{autoRotate=true;},3000); });
+
+container.addEventListener('click', e => {
+  const rect = container.getBoundingClientRect();
+  mouse.x = ((e.clientX-rect.left)/rect.width)*2-1;
+  mouse.y = -((e.clientY-rect.top)/rect.height)*2+1;
+  raycaster.setFromCamera(mouse, camera);
+  const hits = raycaster.intersectObjects(markers.flatMap(m=>[m.ring,m.dot,m.pulse]));
+  if (hits.length>0) {
+    const hit = hits[0].object;
+    const mk = markers.find(m=>m.ring===hit||m.dot===hit||m.pulse===hit);
+    if (mk) showTooltip(mk);
+  }
+});
+
+function showTooltip(mk) {
+  const c = mk.data;
+  activeMarker = mk.index;
+  document.getElementById('tt-flag').textContent = c.flag;
+  document.getElementById('tt-country').textContent = c.name;
+  document.getElementById('tt-reg').textContent = c.regulation;
+  document.getElementById('tt-desc').textContent = c.desc;
+  document.getElementById('tt-optin').textContent = c.optin;
+  document.getElementById('tt-penalty').textContent = c.penalty;
+
+  const tt = document.getElementById('tooltip');
+  const area = document.querySelector('.globe-area');
+  const ar = area.getBoundingClientRect();
+  const p = mk.pos.clone();
+  p.applyMatrix4(markerGroup.matrixWorld);
+  p.project(camera);
+
+  let sx = (p.x*0.5+0.5)*ar.width;
+  let sy = (-p.y*0.5+0.5)*ar.height;
+  let tx = sx+30, ty = sy-80;
+  if (tx+340>ar.width) tx=sx-360;
+  if (ty<0) ty=20;
+  if (ty+340>ar.height) ty=ar.height-360;
+
+  tt.style.left = tx+'px';
+  tt.style.top = ty+'px';
+  tt.classList.add('active');
+  document.querySelectorAll('.country-pill').forEach((p,i)=>p.classList.toggle('active',i===mk.index));
+}
+
+function hideTooltip() {
+  document.getElementById('tooltip').classList.remove('active');
+  activeMarker=-1;
+  document.querySelectorAll('.country-pill').forEach(p=>p.classList.remove('active'));
+}
+
+function focusCountry(idx) {
+  const mk = markers[idx];
+  const c = mk.data;
+  targetRot = { x: -c.lat*(Math.PI/180)*0.3, y: -c.lon*(Math.PI/180)-Math.PI };
+  autoRotate = false;
+  setTimeout(()=>showTooltip(mk), 600);
+  setTimeout(()=>{autoRotate=true;}, 5000);
+}
+
+let time = 0;
+function animate() {
+  requestAnimationFrame(animate);
+  time += 0.016;
+
+  if (autoRotate && !targetRot) {
+    globe.rotation.y += 0.002;
+    wireRef.rotation.copy(globe.rotation);
+    markerGroup.rotation.copy(globe.rotation);
+  }
+
+  if (targetRot) {
+    globe.rotation.x += (targetRot.x-globe.rotation.x)*0.05;
+    globe.rotation.y += (targetRot.y-globe.rotation.y)*0.05;
+    wireRef.rotation.copy(globe.rotation);
+    markerGroup.rotation.copy(globe.rotation);
+    if (Math.abs(targetRot.y-globe.rotation.y)<0.01) targetRot=null;
+  }
+
+  if (!isDragging && !targetRot) {
+    rotVel.x*=0.95; rotVel.y*=0.95;
+    if (!autoRotate) {
+      globe.rotation.x+=rotVel.x; globe.rotation.y+=rotVel.y;
+      wireRef.rotation.copy(globe.rotation); markerGroup.rotation.copy(globe.rotation);
+    }
+  }
+
+  markers.forEach((m,i) => {
+    const s = 1+Math.sin(time*2+i*0.8)*0.3;
+    m.pulse.scale.set(s,s,s);
+    m.pulse.material.opacity = 0.5-(s-1)*1;
+    m.dot.material.color.setHex(i===activeMarker ? 0x1a3c2a : 0xe8734a);
+    m.ring.material.opacity = i===activeMarker ? 1 : 0.85;
+  });
+
+  renderer.render(scene, camera);
+}
+animate();
+
+window.addEventListener('resize', () => {
+  const w=container.clientWidth, h=container.clientHeight;
+  camera.aspect=w/h; camera.updateProjectionMatrix();
+  renderer.setSize(w,h);
+});
+</script>
+</body>
+</html>
