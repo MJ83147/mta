@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SMS Integrations for Teamwork & Productivity | Mobile Text Alerts</title>
+<meta name="description" content="Connect SMS to your team's project management, scheduling, CRM, and communication tools. 30+ native integrations and 5,000+ via Zapier. Start your free trial.">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap');
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'DM Sans',sans-serif;background:#f5f2ec;color:#1a2e1a;overflow-x:hidden;min-height:100vh;}
+
+.nav{display:flex;align-items:center;justify-content:space-between;padding:14px 40px;background:#1a3c2a;border-bottom:3px solid #e8734a;position:sticky;top:0;z-index:200;}
+.nav-logo{display:flex;align-items:center;gap:10px;color:#fff;font-weight:700;font-size:16px;letter-spacing:-.3px;line-height:1.15;}
+.nav-links{display:flex;gap:28px;}
+.nav-links a{color:rgba(255,255,255,.7);text-decoration:none;font-size:14px;font-weight:500;transition:color .2s;}
+.nav-links a:hover{color:#fff;}
+.nav-right{display:flex;align-items:center;gap:16px;}
+.nav-login{color:rgba(255,255,255,.8);text-decoration:none;font-size:14px;font-weight:600;}
+.nav-cta{background:#e8734a;color:#fff;border:none;padding:10px 20px;border-radius:24px;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;transition:background .2s;letter-spacing:.3px;text-transform:uppercase;}
+.nav-cta:hover{background:#d4623b;}
+
+.page-w{max-width:1140px;margin:0 auto;padding:0 32px;position:relative;}
+.decor{position:fixed;pointer-events:none;z-index:0;border-radius:50%;}
+
+.hero{text-align:center;padding:56px 0 28px;position:relative;z-index:1;}
+.hero-ey{display:inline-block;font-size:16px;font-style:italic;color:#1a3c2a;margin-bottom:8px;}
+.hero-ey-line{display:block;width:100%;height:3px;background:#5bbfaf;margin-top:4px;border-radius:2px;}
+.hero h1{font-size:50px;font-weight:700;letter-spacing:-1.5px;line-height:1.08;margin-bottom:16px;color:#1a2e1a;}
+.hero p{font-size:17px;color:#5a6b5a;max-width:600px;margin:0 auto 28px;line-height:1.6;}
+.hero-btns{display:flex;justify-content:center;gap:16px;flex-wrap:wrap;}
+.btn-p{background:#e8734a;color:#fff;border:none;padding:14px 28px;border-radius:28px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;letter-spacing:.5px;text-transform:uppercase;transition:background .2s;}
+.btn-p:hover{background:#d4623b;}
+.btn-s{background:transparent;color:#1a3c2a;border:1.5px solid #1a3c2a;padding:14px 28px;border-radius:28px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;letter-spacing:.5px;text-transform:uppercase;transition:all .2s;}
+.btn-s:hover{background:#1a3c2a;color:#fff;}
+
+/* ── Timeline ── */
+.tl-wrap{position:sticky;top:56px;z-index:100;background:rgba(245,242,236,.95);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);padding:20px 0 0;border-bottom:1px solid rgba(26,60,42,.08);transition:box-shadow .3s;}
+.tl-wrap.scrolled{box-shadow:0 4px 24px rgba(26,44,26,.07);}
+.tl-inner{position:relative;max-width:1000px;margin:0 auto;padding:0 40px 20px;}
+.tl-track{position:absolute;top:28px;left:40px;right:40px;height:3px;background:#ddd9d2;border-radius:2px;}
+.tl-prog{position:absolute;top:0;left:0;height:100%;background:#1a3c2a;border-radius:2px;transition:width .4s ease;}
+.tl-nodes{display:flex;justify-content:space-between;position:relative;z-index:2;}
+
+.tl-node{display:flex;flex-direction:column;align-items:center;cursor:pointer;width:120px;text-decoration:none;transition:transform .2s;}
+.tl-node:hover{transform:translateY(-2px);}
+.tl-dot{width:56px;height:56px;background:#fff;border:2.5px solid #d6d2ca;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:all .3s;box-shadow:0 2px 12px rgba(26,44,26,.06);position:relative;}
+.tl-dot svg{width:24px;height:24px;fill:none;stroke:#5a6b5a;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;transition:stroke .3s;}
+.tl-node.active .tl-dot{background:#1a3c2a;border-color:#1a3c2a;box-shadow:0 0 0 6px rgba(26,60,42,.1),0 4px 16px rgba(26,44,26,.12);}
+.tl-node.active .tl-dot svg{stroke:#fff;}
+.tl-pulse{position:absolute;top:50%;left:50%;width:56px;height:56px;border-radius:50%;transform:translate(-50%,-50%);border:2px solid #e8734a;opacity:0;pointer-events:none;}
+.tl-node.active .tl-pulse{animation:tl-ping 2s ease-out infinite;}
+@keyframes tl-ping{0%{width:56px;height:56px;opacity:.5;}100%{width:90px;height:90px;opacity:0;}}
+.tl-time{display:none;}
+.tl-label{font-size:11px;font-weight:600;color:#5a6b5a;margin-top:10px;text-align:center;line-height:1.3;transition:color .3s;}
+.tl-node.active .tl-label{color:#1a2e1a;}
+
+/* ── Sections ── */
+.wf{padding:64px 0 24px;position:relative;z-index:1;scroll-margin-top:200px;}
+.wf+.wf{border-top:1px solid #e2dfd8;}
+.wf-head{display:flex;align-items:center;gap:16px;margin-bottom:20px;}
+.wf-icon{width:52px;height:52px;background:#fff;border:2px solid #e2dfd8;border-radius:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.wf-icon svg{width:24px;height:24px;fill:none;stroke:#1a3c2a;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+.wf-head h2{font-size:28px;font-weight:700;letter-spacing:-.7px;line-height:1.15;color:#1a2e1a;}
+.wf-head h2 span{color:#e8734a;}
+.wf-count{font-size:13px;color:#a0a898;font-weight:500;margin-top:2px;}
+.wf-narrative p{font-size:15px;color:#5a6b5a;line-height:1.7;margin-bottom:14px;}
+.wf-narrative p strong{color:#1a2e1a;font-weight:600;}
+
+.wf-grid-lr{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:start;}
+.wf-grid-rl{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:start;}
+.wf-grid-rl .wf-cards-col{order:-1;}
+.wf-grid-wide .wf-narrative{margin-bottom:28px;max-width:680px;}
+
+.wf-ex{background:#fff;border:1.5px solid #e2dfd8;border-radius:14px;padding:18px 20px;margin-top:12px;}
+.wf-ex-label{font-size:11px;font-weight:700;color:#e8734a;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;}
+.wf-ex-flow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.wf-ex-step{background:#f5f2ec;border-radius:8px;padding:8px 12px;font-size:12px;font-weight:600;color:#1a3c2a;}
+.wf-ex-step.sms{background:#1a3c2a;color:#fff;}
+.wf-ex-arrow{color:#c8c4bc;font-size:14px;flex-shrink:0;}
+
+.wf-cards-col{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.wf-cards-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:4px;}
+.wf-cards-3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:4px;}
+
+.i-card{background:#fff;border:1.5px solid #e2dfd8;border-radius:12px;padding:16px;transition:all .25s;}
+.i-card:hover{border-color:#1a3c2a;box-shadow:0 4px 20px rgba(26,44,26,.07);}
+.i-card-name{font-size:14px;font-weight:700;color:#1a2e1a;margin-bottom:3px;}
+.i-card-desc{font-size:12px;color:#7a8a7a;line-height:1.5;}
+.i-card-tag{display:inline-block;margin-top:8px;font-size:10px;font-weight:700;color:#e8734a;background:rgba(232,115,74,.08);padding:3px 8px;border-radius:100px;letter-spacing:.3px;text-transform:uppercase;}
+
+.zap-call{background:#fff;border:2px solid #e2dfd8;border-radius:16px;padding:36px;text-align:center;margin:56px 0;position:relative;overflow:hidden;}
+.zap-call::before{content:'';position:absolute;top:-30px;right:-30px;width:120px;height:120px;background:rgba(200,230,223,.3);border-radius:50%;}
+.zap-call h3{font-size:24px;font-weight:700;letter-spacing:-.5px;margin-bottom:8px;color:#1a2e1a;position:relative;}
+.zap-call p{font-size:15px;color:#5a6b5a;line-height:1.6;max-width:520px;margin:0 auto 20px;position:relative;}
+
+.stats-bar{display:flex;justify-content:center;gap:48px;padding:40px 24px;background:#1a3c2a;border-radius:16px;margin:0 0 48px;position:relative;overflow:hidden;}
+.stats-bar::before{content:'';position:absolute;top:-40px;right:-40px;width:140px;height:140px;background:rgba(91,191,175,.08);border-radius:50%;}
+.stat-item{text-align:center;position:relative;z-index:1;}
+.stat-val{font-size:32px;font-weight:700;color:#fff;}
+.stat-lbl{font-size:13px;color:rgba(255,255,255,.45);margin-top:4px;}
+
+.faq{padding:48px 0;border-top:1px solid #e2dfd8;}
+.faq h2{font-size:30px;font-weight:700;letter-spacing:-.8px;margin-bottom:28px;color:#1a2e1a;}
+.faq-item{border-bottom:1px solid #e2dfd8;padding:20px 0;cursor:pointer;}
+.faq-q{display:flex;justify-content:space-between;align-items:center;font-size:16px;font-weight:600;color:#1a2e1a;}
+.faq-tog{width:28px;height:28px;background:#fff;border:1.5px solid #ddd9d2;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;color:#a0a898;transition:all .25s;flex-shrink:0;}
+.faq-item.open .faq-tog{background:#1a3c2a;border-color:#1a3c2a;color:#fff;transform:rotate(45deg);}
+.faq-a{max-height:0;overflow:hidden;transition:max-height .35s ease,padding .35s ease;}
+.faq-item.open .faq-a{max-height:300px;padding-top:12px;}
+.faq-a p{font-size:14px;color:#5a6b5a;line-height:1.7;}
+
+.bot-cta{text-align:center;padding:48px 24px 72px;}
+.bot-cta h2{font-size:36px;font-weight:700;letter-spacing:-1px;line-height:1.15;margin-bottom:12px;color:#1a2e1a;}
+.bot-cta p{font-size:16px;color:#5a6b5a;max-width:480px;margin:0 auto 28px;line-height:1.6;}
+.mockup-label{position:fixed;bottom:16px;right:16px;background:#e8734a;color:#fff;font-size:11px;font-weight:700;padding:6px 12px;border-radius:6px;letter-spacing:.5px;z-index:999;text-transform:uppercase;}
+html{scroll-behavior:smooth;}
+</style>
+</head>
+<body>
+
+<div class="decor" style="top:200px;left:-30px;width:100px;height:100px;background:#c8e6df;opacity:.45;"></div>
+<div class="decor" style="top:340px;right:50px;width:50px;height:50px;background:#1a3c2a;opacity:.12;border-radius:6px;transform:rotate(45deg);"></div>
+<div class="decor" style="top:600px;right:-20px;width:80px;height:80px;background:#b8d8d0;opacity:.3;"></div>
+<div class="decor" style="bottom:180px;left:50px;width:45px;height:45px;background:#c8e6df;opacity:.3;"></div>
+<svg style="position:fixed;top:140px;left:-50px;width:320px;height:380px;pointer-events:none;z-index:0;opacity:.18;"><path d="M20,340 Q70,200 180,175 Q300,150 280,40" fill="none" stroke="#999" stroke-width="1.5" stroke-dasharray="6 6"/></svg>
+<svg style="position:fixed;top:320px;right:-30px;width:280px;height:320px;pointer-events:none;z-index:0;opacity:.18;"><path d="M260,20 Q190,110 200,200 Q220,300 90,310" fill="none" stroke="#999" stroke-width="1.5" stroke-dasharray="6 6"/></svg>
+
+<nav class="nav">
+  <div class="nav-logo"><span>Mobile<br>Text Alerts</span></div>
+  <div class="nav-links"><a href="#">Solutions</a><a href="#">Platform</a><a href="#">Resources</a><a href="#">Pricing</a><a href="#">Developers</a></div>
+  <div class="nav-right"><a href="#" class="nav-login">LOG IN</a><button class="nav-cta">Instant 14-Day Free Trial</button></div>
+</nav>
+
+<div class="page-w">
+<div class="hero">
+  <div class="hero-ey">SMS Integrations for Teamwork<span class="hero-ey-line"></span></div>
+  <h1>Your team uses 10 tools.<br>SMS is the thread that<br>connects them.</h1>
+  <p>Tasks get assigned in one app, meetings booked in another, invoices sent in a third. Mobile Text Alerts adds an SMS layer across all of them, so the right person always knows what's happening, the moment it happens.</p>
+  <div class="hero-btns"><button class="btn-p">Start my free trial</button><button class="btn-s">Book a demo</button></div>
+</div>
+</div>
+
+<!-- Timeline -->
+<div class="tl-wrap" id="tlWrap">
+<div class="tl-inner">
+  <div class="tl-track"><div class="tl-prog" id="tlProg"></div></div>
+  <div class="tl-nodes">
+    <div class="tl-node" data-target="projects"><div class="tl-dot"><div class="tl-pulse"></div><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></div><div class="tl-label">Project<br>Management</div></div>
+    <div class="tl-node" data-target="scheduling"><div class="tl-dot"><div class="tl-pulse"></div><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div><div class="tl-label">Scheduling<br>& Events</div></div>
+    <div class="tl-node" data-target="forms"><div class="tl-dot"><div class="tl-pulse"></div><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="13" y2="17"/></svg></div><div class="tl-label">Forms &<br>Lead Capture</div></div>
+    <div class="tl-node" data-target="comms"><div class="tl-dot"><div class="tl-pulse"></div><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div><div class="tl-label">Team<br>Communication</div></div>
+    <div class="tl-node" data-target="crm"><div class="tl-dot"><div class="tl-pulse"></div><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg></div><div class="tl-label">CRM &<br>Clients</div></div>
+    <div class="tl-node" data-target="ops"><div class="tl-dot"><div class="tl-pulse"></div><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg></div><div class="tl-label">Billing<br>& Ops</div></div>
+  </div>
+</div>
+</div>
+
+<div class="page-w">
+
+<!-- 1. PROJECT MANAGEMENT (narrative left, cards right) -->
+<section class="wf" id="projects">
+  <div class="wf-head"><div class="wf-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></div><div><h2>SMS alerts for <span>project management</span> tools</h2><div class="wf-count">7 integrations</div></div></div>
+  <div class="wf-grid-lr">
+    <div class="wf-narrative">
+      <p>A task gets reassigned. A deadline shifts. A blocker appears. If the person who needs to act doesn't find out until they next check the app, you've lost hours.</p>
+      <p><strong>SMS notifications from your project management tools close that gap.</strong> When a card moves in Trello, a task gets assigned in Asana, or a checklist step completes in Process Street, the relevant team member gets a text immediately. No login required, no notification fatigue from yet another app pinging their desktop.</p>
+      <p>For distributed teams especially, text alerts for project updates reduce the time between "something changed" and "someone acted on it" from hours to minutes.</p>
+      <div class="wf-ex"><div class="wf-ex-label">Example workflow</div><div class="wf-ex-flow"><span class="wf-ex-step">Task assigned in Trello</span><span class="wf-ex-arrow">→</span><span class="wf-ex-step sms">SMS sent to assignee</span><span class="wf-ex-arrow">→</span><span class="wf-ex-step">Task started within minutes</span></div></div>
+    </div>
+    <div class="wf-cards-col">
+      <div class="i-card"><div class="i-card-name">Trello</div><div class="i-card-desc">SMS when cards are moved, assigned, or approaching due dates.</div><span class="i-card-tag">Board activity alerts</span></div>
+      <div class="i-card"><div class="i-card-name">Asana</div><div class="i-card-desc">Text notifications for task creation, completion, and assignment changes.</div><span class="i-card-tag">Task assignment alerts</span></div>
+      <div class="i-card"><div class="i-card-name">ClickUp</div><div class="i-card-desc">Automated SMS for status changes, new comments, and approaching deadlines.</div><span class="i-card-tag">Status change alerts</span></div>
+      <div class="i-card"><div class="i-card-name">MeisterTask</div><div class="i-card-desc">Text alerts for task updates and section changes in your Kanban boards.</div><span class="i-card-tag">Task update alerts</span></div>
+      <div class="i-card"><div class="i-card-name">Process Street</div><div class="i-card-desc">SMS as checklist steps are completed, keeping workflows on track.</div><span class="i-card-tag">Workflow step alerts</span></div>
+      <div class="i-card"><div class="i-card-name">Zenkit</div><div class="i-card-desc">Text notifications for collection updates and item assignments.</div><span class="i-card-tag">Collection alerts</span></div>
+      <div class="i-card"><div class="i-card-name">Approval Donkey</div><div class="i-card-desc">Alert approvers via SMS when sign-offs are needed.</div><span class="i-card-tag">Approval request alerts</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- 2. SCHEDULING (cards left, narrative right) -->
+<section class="wf" id="scheduling">
+  <div class="wf-head"><div class="wf-icon"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div><div><h2>SMS reminders for <span>scheduling & events</span></h2><div class="wf-count">6 integrations</div></div></div>
+  <div class="wf-grid-rl">
+    <div class="wf-narrative">
+      <p>No-shows are expensive. A missed appointment costs time, revenue, and the effort it took to book it in the first place. Email reminders have open rates around 20%. Text messages sit closer to 98%.</p>
+      <p><strong>SMS reminders sent automatically from your scheduling tools practically eliminate no-shows.</strong> When someone books a meeting through Calendly, registers for a webinar on Demio, or confirms an event in Cvent, they get a text reminder at the right time, without anyone on your team lifting a finger.</p>
+      <p>This matters most for service businesses, healthcare providers, consultants, and anyone whose calendar is revenue. A single SMS reminder 24 hours before an appointment gets read within 3 minutes on average.</p>
+      <div class="wf-ex"><div class="wf-ex-label">Example workflow</div><div class="wf-ex-flow"><span class="wf-ex-step">Meeting booked via Calendly</span><span class="wf-ex-arrow">→</span><span class="wf-ex-step sms">SMS reminder at 24hr + 1hr</span><span class="wf-ex-arrow">→</span><span class="wf-ex-step">Attendance rate improves</span></div></div>
+    </div>
+    <div class="wf-cards-col wf-cards-col">
+      <div class="i-card"><div class="i-card-name">Calendly</div><div class="i-card-desc">Automatic SMS confirmations and reminders for every booking.</div><span class="i-card-tag">Appointment reminders</span></div>
+      <div class="i-card"><div class="i-card-name">Cvent</div><div class="i-card-desc">Text attendees about event details, schedule changes, and logistics.</div><span class="i-card-tag">Event update alerts</span></div>
+      <div class="i-card"><div class="i-card-name">Bookafy</div><div class="i-card-desc">Booking confirmations and reminder sequences via text.</div><span class="i-card-tag">Booking confirmations</span></div>
+      <div class="i-card"><div class="i-card-name">Acuity Scheduling</div><div class="i-card-desc">Automated SMS for appointment reminders, rescheduling, and follow-ups.</div><span class="i-card-tag">Reminder automation</span></div>
+      <div class="i-card"><div class="i-card-name">Zoom</div><div class="i-card-desc">Text meeting links and join reminders to participants before calls.</div><span class="i-card-tag">Meeting reminders</span></div>
+      <div class="i-card"><div class="i-card-name">Demio</div><div class="i-card-desc">SMS for webinar registration confirmations, start-time reminders, and replays.</div><span class="i-card-tag">Webinar reminders</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- 3. FORMS (narrative left, cards right) -->
+<section class="wf" id="forms">
+  <div class="wf-head"><div class="wf-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="13" y2="17"/></svg></div><div><h2>SMS notifications for <span>form submissions</span></h2><div class="wf-count">5 integrations</div></div></div>
+  <div class="wf-grid-lr">
+    <div class="wf-narrative">
+      <p>Someone fills out your contact form at 2pm. Your sales rep sees the email at 4pm. By then, the prospect has already spoken to a competitor. Speed-to-lead is one of the strongest predictors of conversion, and the difference between a 5-minute response and a 30-minute response can cut your odds in half.</p>
+      <p><strong>SMS alerts on form submissions get the right person notified instantly.</strong> A Typeform submission triggers a text to your sales lead. A Gravity Forms entry pings your operations team. No one has to be watching their inbox.</p>
+      <p>This is especially effective for businesses running paid traffic to lead capture forms. You're already paying for the click. SMS makes sure the lead doesn't go cold before someone picks up the phone.</p>
+      <div class="wf-ex"><div class="wf-ex-label">Example workflow</div><div class="wf-ex-flow"><span class="wf-ex-step">Lead fills out Typeform</span><span class="wf-ex-arrow">→</span><span class="wf-ex-step sms">SMS to sales rep</span><span class="wf-ex-arrow">→</span><span class="wf-ex-step">Callback within minutes</span></div></div>
+    </div>
+    <div class="wf-cards-col">
+      <div class="i-card"><div class="i-card-name">Typeform</div><div class="i-card-desc">Instant SMS to your team the moment a form submission arrives.</div><span class="i-card-tag">Instant lead alerts</span></div>
+      <div class="i-card"><div class="i-card-name">Gravity Forms</div><div class="i-card-desc">Trigger text notifications on any WordPress form submission.</div><span class="i-card-tag">Form submission alerts</span></div>
+      <div class="i-card"><div class="i-card-name">Formstack</div><div class="i-card-desc">Automated SMS when forms are completed or flagged for review.</div><span class="i-card-tag">Completion notifications</span></div>
+      <div class="i-card"><div class="i-card-name">Ninja Forms</div><div class="i-card-desc">Text alerts to the right staff member when new entries arrive.</div><span class="i-card-tag">New entry alerts</span></div>
+      <div class="i-card"><div class="i-card-name">Zoho Forms</div><div class="i-card-desc">SMS notifications tied to form logic, routing rules, and field conditions.</div><span class="i-card-tag">Conditional alerts</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- 4. COMMUNICATION (full-width narrative, 4-col cards) -->
+<section class="wf" id="comms">
+  <div class="wf-head"><div class="wf-icon"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div><div><h2>SMS escalation for <span>team communication</span></h2><div class="wf-count">4 integrations</div></div></div>
+  <div class="wf-grid-wide">
+    <div class="wf-narrative">
+      <p>Slack messages get buried. Discord pings go unseen when someone's away from their desk. Email sits unread for hours. Most internal communication tools work well for ambient updates, but they fail at urgency.</p>
+      <p><strong>SMS acts as an escalation channel for the messages that actually need immediate attention.</strong> A critical Slack message can trigger a text to the on-call engineer. A Discord alert can reach community managers who are offline. Planning Center can notify volunteers about last-minute schedule changes. The point isn't to replace your communication tools. It's to make sure the 5% of messages that are genuinely urgent get through, even when someone isn't at a screen.</p>
+    </div>
+    <div class="wf-cards-row">
+      <div class="i-card"><div class="i-card-name">Slack</div><div class="i-card-desc">Trigger SMS from specific channels, keywords, or emoji reactions.</div><span class="i-card-tag">Urgent escalation</span></div>
+      <div class="i-card"><div class="i-card-name">Discord</div><div class="i-card-desc">Text moderators and admins when they're away from Discord.</div><span class="i-card-tag">Offline alerts</span></div>
+      <div class="i-card"><div class="i-card-name">Mighty Networks</div><div class="i-card-desc">SMS community members for important announcements.</div><span class="i-card-tag">Community alerts</span></div>
+      <div class="i-card"><div class="i-card-name">Planning Center</div><div class="i-card-desc">Text members about schedule changes and event updates.</div><span class="i-card-tag">Member notifications</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- 5. CRM (cards left, narrative right) -->
+<section class="wf" id="crm">
+  <div class="wf-head"><div class="wf-icon"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg></div><div><h2>SMS workflows for your <span>CRM</span></h2><div class="wf-count">4 integrations</div></div></div>
+  <div class="wf-grid-rl">
+    <div class="wf-narrative">
+      <p>Your CRM tracks every deal, contact, and interaction. It knows when a prospect goes quiet, when a deal moves to the next stage, and when a follow-up is overdue. The problem is that this intelligence is locked inside the CRM until someone opens it.</p>
+      <p><strong>SMS bridges the gap between CRM data and team action.</strong> When an opportunity moves to "negotiation" in Salesforce, the account manager gets a text. When a HubSpot contact hasn't been touched in 14 days, the rep gets a nudge. When a deal closes in Copper, the fulfilment team is alerted instantly.</p>
+      <p>CRM-triggered SMS works both internally (alerting your team) and externally (texting clients at key moments in the relationship). Either way, the outcome is the same: your CRM data drives behaviour instead of sitting in a dashboard.</p>
+      <div class="wf-ex"><div class="wf-ex-label">Example workflow</div><div class="wf-ex-flow"><span class="wf-ex-step">Deal stage changes in HubSpot</span><span class="wf-ex-arrow">→</span><span class="wf-ex-step sms">SMS to account manager</span><span class="wf-ex-arrow">→</span><span class="wf-ex-step">Follow-up sent same day</span></div></div>
+    </div>
+    <div class="wf-cards-col wf-cards-col">
+      <div class="i-card"><div class="i-card-name">HubSpot</div><div class="i-card-desc">Sync contacts and trigger texts based on pipeline changes and deal stages.</div><span class="i-card-tag">Pipeline stage alerts</span></div>
+      <div class="i-card"><div class="i-card-name">Salesforce</div><div class="i-card-desc">SMS workflows tied to opportunity updates, new leads, and case assignments.</div><span class="i-card-tag">Opportunity notifications</span></div>
+      <div class="i-card"><div class="i-card-name">Copper</div><div class="i-card-desc">Automate relationship-driven texts from your Google Workspace CRM.</div><span class="i-card-tag">Relationship alerts</span></div>
+      <div class="i-card"><div class="i-card-name">ActiveCampaign</div><div class="i-card-desc">Add SMS steps to multi-channel automation sequences alongside email.</div><span class="i-card-tag">Automation triggers</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- 6. BILLING & OPS (full-width narrative, 3-col cards) -->
+<section class="wf" id="ops">
+  <div class="wf-head"><div class="wf-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg></div><div><h2>SMS notifications for <span>billing & operations</span></h2><div class="wf-count">6 integrations</div></div></div>
+  <div class="wf-grid-wide">
+    <div class="wf-narrative">
+      <p>An invoice gets paid. A subscription fails to renew. A new hire starts on Monday. These operational details matter, but they're easy to miss when they arrive as one email among dozens.</p>
+      <p><strong>SMS for operational events makes sure nothing slips through.</strong> QuickBooks can text your finance team when a large payment arrives. Chargebee can alert support when a subscription payment fails. Bamboo HR can send onboarding reminders to managers before a new employee's first day. For small teams especially, where the same person often handles multiple roles, text alerts from billing and HR tools act as a reliable second brain.</p>
+    </div>
+    <div class="wf-cards-3">
+      <div class="i-card"><div class="i-card-name">QuickBooks</div><div class="i-card-desc">Text alerts for payments received, invoices overdue, and expense flags.</div><span class="i-card-tag">Payment notifications</span></div>
+      <div class="i-card"><div class="i-card-name">Wave</div><div class="i-card-desc">SMS for invoice activity, payment confirmations, and receipt tracking.</div><span class="i-card-tag">Invoice alerts</span></div>
+      <div class="i-card"><div class="i-card-name">InvoiceBerry</div><div class="i-card-desc">Automatic texts when invoices are sent, viewed, or paid.</div><span class="i-card-tag">Invoice tracking</span></div>
+      <div class="i-card"><div class="i-card-name">Chargebee</div><div class="i-card-desc">SMS alerts for subscription changes, failed renewals, and plan upgrades.</div><span class="i-card-tag">Subscription alerts</span></div>
+      <div class="i-card"><div class="i-card-name">Bamboo HR</div><div class="i-card-desc">Text notifications for HR events, time-off approvals, and onboarding tasks.</div><span class="i-card-tag">HR event alerts</span></div>
+      <div class="i-card"><div class="i-card-name">Zapier</div><div class="i-card-desc">Connect 5,000+ additional apps to SMS through custom automation flows.</div><span class="i-card-tag">Universal connector</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- Zapier -->
+<div class="zap-call">
+  <h3>Don't see your tool? Connect it anyway.</h3>
+  <p>Mobile Text Alerts integrates with Zapier, giving you access to 5,000+ apps. If your team uses it, you can connect SMS to it.</p>
+  <button class="btn-p">Explore Zapier integrations</button>
+</div>
+
+<!-- Stats -->
+<div class="stats-bar">
+  <div class="stat-item"><div class="stat-val">5,000+</div><div class="stat-lbl">Integrations via Zapier</div></div>
+  <div class="stat-item"><div class="stat-val">30+</div><div class="stat-lbl">Native teamwork integrations</div></div>
+  <div class="stat-item"><div class="stat-val">98%</div><div class="stat-lbl">SMS open rate</div></div>
+  <div class="stat-item"><div class="stat-val">99.9%</div><div class="stat-lbl">Delivery rate</div></div>
+</div>
+
+<!-- FAQ -->
+<div class="faq">
+  <h2>Common questions about SMS integrations for teams</h2>
+  <div class="faq-item"><div class="faq-q">How do SMS integrations work with my existing tools?<span class="faq-tog">+</span></div><div class="faq-a"><p>Mobile Text Alerts connects to your tools either through native integrations (direct connections built into the platform) or through Zapier (which acts as a bridge to 5,000+ apps). Once connected, you set trigger conditions. For example: "When a card moves to Done in Trello, send an SMS to the project manager." Setup typically takes a few minutes per integration, and no coding is required.</p></div></div>
+  <div class="faq-item"><div class="faq-q">Can I send SMS to my team and customers from the same platform?<span class="faq-tog">+</span></div><div class="faq-a"><p>Yes. Mobile Text Alerts supports both internal notifications (alerting your team about events in your tools) and external messaging (sending texts to customers and clients). You manage both from a single dashboard, with separate contact lists, automation rules, and compliance settings for each.</p></div></div>
+  <div class="faq-item"><div class="faq-q">Is there a limit to how many integrations I can connect?<span class="faq-tog">+</span></div><div class="faq-a"><p>No. You can connect as many integrations as your workflow requires. Most teams start with one or two (typically their project management tool and scheduling app) and expand from there.</p></div></div>
+  <div class="faq-item"><div class="faq-q">Do I need technical skills to set up these integrations?<span class="faq-tog">+</span></div><div class="faq-a"><p>No. Both native integrations and Zapier connections use visual, no-code setup flows. You select a trigger event (something happening in your tool), define the SMS content, choose the recipients, and activate. Mobile Text Alerts also offers free 1-on-1 onboarding demos.</p></div></div>
+  <div class="faq-item"><div class="faq-q">What does SMS cost per message?<span class="faq-tog">+</span></div><div class="faq-a"><p>Mobile Text Alerts offers plans based on message volume, starting with a free trial that includes credits to test your integrations. Pricing scales with usage, so you only pay for what you send. Visit the pricing page for current plan details.</p></div></div>
+</div>
+
+<!-- Bottom CTA -->
+<div class="bot-cta">
+  <h2>One text layer.<br>Every tool connected.</h2>
+  <p>Stop switching between apps to keep your team informed. Let SMS do it automatically.</p>
+  <div class="hero-btns"><button class="btn-p">Start my free trial</button><button class="btn-s">See all integrations</button></div>
+</div>
+
+</div>
+
+<div class="mockup-label">Mockup / Concept</div>
+
+<script>
+const tlWrap=document.getElementById('tlWrap'),tlProg=document.getElementById('tlProg'),tlNodes=document.querySelectorAll('.tl-node'),sIds=['projects','scheduling','forms','comms','crm','ops'];
+function updateTL(){
+  tlWrap.classList.toggle('scrolled',window.scrollY>400);
+  let ai=-1;
+  sIds.forEach((id,i)=>{const el=document.getElementById(id);if(el&&el.getBoundingClientRect().top<260)ai=i;});
+  tlNodes.forEach((n,i)=>n.classList.toggle('active',i===ai));
+  tlProg.style.width=ai<0?'0%':((ai+.5)/sIds.length*100)+'%';
+}
+window.addEventListener('scroll',updateTL);updateTL();
+document.querySelectorAll('.tl-node').forEach(node=>{node.addEventListener('click',()=>{const t=node.getAttribute('data-target');const el=document.getElementById(t);if(el)el.scrollIntoView({behavior:'smooth',block:'start'});});});
+document.querySelectorAll('.faq-item').forEach(item=>{item.querySelector('.faq-q').addEventListener('click',()=>{const o=item.classList.contains('open');document.querySelectorAll('.faq-item').forEach(i=>i.classList.remove('open'));if(!o)item.classList.add('open');});});
+</script>
+</body>
+</html>
